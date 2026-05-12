@@ -366,6 +366,11 @@ const handleSaveEvent = async (savedEvent) => {
   color: var(--primary);
 }
 
+/* 라이트 모드에서 btn-outline 텍스트 색상 강제 지정 */
+:root:not([data-theme='dark']) .btn-outline {
+  color: #1e293b;
+}
+
 .calendar-card {
   flex: 1;
   padding: 1rem;
@@ -383,6 +388,16 @@ const handleSaveEvent = async (savedEvent) => {
 :deep(.vuecal__menu) {
   background-color: var(--surface-color) !important;
   border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary) !important;
+}
+
+:deep(.vuecal__menu li) {
+  color: var(--text-primary) !important;
+}
+
+:deep(.vuecal__menu li.active) {
+  color: var(--primary) !important;
+  border-bottom-color: var(--primary) !important;
 }
 
 :deep(.vuecal__cell) {
