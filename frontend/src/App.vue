@@ -4,6 +4,7 @@ import { RouterView, useRouter, useRoute } from 'vue-router'
 import { isLoggedIn as checkLogin, logout } from './api/auth'
 import { getPendingFriendRequestsCount } from './api/friends'
 import FriendManagerModal from './components/FriendManagerModal.vue'
+import logoBuddy from './assets/logo_buddy.png'
 
 const router = useRouter()
 const route = useRoute()
@@ -108,7 +109,7 @@ watchEffect(() => {
   <div class="app-layout">
     <header class="top-nav card">
       <div class="nav-brand" style="cursor: pointer;" @click="router.push('/')">
-
+    <img :src="logoBuddy" class="logo-image" alt="Logo" />
       </div>
       <div class="nav-actions">
         <button class="btn btn-icon" @click="toggleTheme" title="테마 전환">
@@ -165,20 +166,86 @@ watchEffect(() => {
   height: 100px;
   width: auto;
   filter: none;
-}
-
-/* Dark mode logo adjustment */
-[data-theme='dark'] .nav-brand .logo-image {
-  filter: invert(1) brightness(1.2);
-}
   object-fit: contain;
   transition: transform 0.2s;
 }
+
+/* Dark mode logo unchanged: no filter applied */
 
 .nav-brand .logo-image:hover {
   transform: scale(1.05);
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.friend-btn {
+  position: relative;
+}
+
+.badge-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--danger);
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1.5rem 2rem;
+  gap: 2rem;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+}
 .nav-actions {
   display: flex;
   align-items: center;
