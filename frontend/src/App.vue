@@ -164,6 +164,13 @@ watchEffect(() => {
 .nav-brand .logo-image {
   height: 100px;
   width: auto;
+  filter: none;
+}
+
+/* Dark mode logo adjustment */
+[data-theme='dark'] .nav-brand .logo-image {
+  filter: invert(1) brightness(1.2);
+}
   object-fit: contain;
   transition: transform 0.2s;
 }
