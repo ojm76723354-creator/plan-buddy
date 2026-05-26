@@ -108,7 +108,7 @@ watchEffect(() => {
   <div class="app-layout">
     <header class="top-nav card">
       <div class="nav-brand" style="cursor: pointer;" @click="router.push('/')">
-        <img src="@/assets/logo_buddy.png" alt="Plan Buddy" class="logo-image" />
+
       </div>
       <div class="nav-actions">
         <button class="btn btn-icon" @click="toggleTheme" title="테마 전환">
