@@ -34,6 +34,14 @@ def send_friend_request(req: FriendRequest, db: Session = Depends(get_db), curre
     db.refresh(new_friendship)
     return new_friendship
 
+@friend_router.get("/pending-count")
+def get_pending_count(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    count = db.query(Friendship).filter(
+        Friendship.user_id_2 == current_user.id,
+        Friendship.status == FriendshipStatus.PENDING
+    ).count()
+    return {"count": count}
+
 @friend_router.get("/list", response_model=List[dict])
 def get_friends(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # Returns a list of friends with their statuses and usernames

@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watchEffect, onMounted, watch } from 'vue'
+import { ref, watchEffect, onMounted, onUnmounted, watch } from 'vue'
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { isLoggedIn as checkLogin, logout } from './api/auth'
+import { getPendingFriendRequestsCount } from './api/friends'
 import FriendManagerModal from './components/FriendManagerModal.vue'
 
 const router = useRouter()
@@ -9,14 +10,60 @@ const route = useRoute()
 const isDarkMode = ref(false)
 const isLoggedIn = ref(false)
 const isFriendModalOpen = ref(false)
+const pendingCount = ref(0)
+
+const fetchPendingCount = async () => {
+  if (!isLoggedIn.value) {
+    pendingCount.value = 0
+    return
+  }
+  try {
+    const res = await getPendingFriendRequestsCount()
+    pendingCount.value = res.count
+  } catch (err) {
+    console.error('Failed to fetch pending friend requests count', err)
+  }
+}
+
+let intervalId = null
 
 onMounted(() => {
   isLoggedIn.value = checkLogin()
+  if (isLoggedIn.value) {
+    fetchPendingCount()
+  }
+  
+  // Poll every 30 seconds
+  intervalId = setInterval(() => {
+    if (isLoggedIn.value) {
+      fetchPendingCount()
+    }
+  }, 30000)
+})
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId)
+  }
 })
 
 // Re-check login whenever route changes (e.g. after redirect from login page)
 watch(() => route.path, () => {
   isLoggedIn.value = checkLogin()
+  if (isLoggedIn.value) {
+    fetchPendingCount()
+  } else {
+    pendingCount.value = 0
+  }
+})
+
+// Fetch count when login state changes
+watch(isLoggedIn, (newVal) => {
+  if (newVal) {
+    fetchPendingCount()
+  } else {
+    pendingCount.value = 0
+  }
 })
 
 const handleLogout = () => {
@@ -42,6 +89,11 @@ const openFriendModal = () => {
   isFriendModalOpen.value = true
 }
 
+const handleFriendModalClose = () => {
+  isFriendModalOpen.value = false
+  fetchPendingCount()
+}
+
 // 다크모드 적용
 watchEffect(() => {
   if (isDarkMode.value) {
@@ -62,8 +114,9 @@ watchEffect(() => {
         <button class="btn btn-icon" @click="toggleTheme" title="테마 전환">
           {{ isDarkMode ? '☀️' : '🌙' }}
         </button>
-        <button class="btn btn-outline" @click="openFriendModal">
+        <button class="btn btn-outline friend-btn" @click="openFriendModal">
           👥 친구 관리
+          <span v-if="pendingCount > 0" class="badge-count">{{ pendingCount }}</span>
         </button>
         <button v-if="isLoggedIn" class="btn btn-outline" @click="router.push('/mypage')">
           👤 내 정보
@@ -84,7 +137,7 @@ watchEffect(() => {
       </div>
     </main>
 
-    <FriendManagerModal :isOpen="isFriendModalOpen" @close="isFriendModalOpen = false" />
+    <FriendManagerModal :isOpen="isFriendModalOpen" @close="handleFriendModalClose" />
   </div>
 </template>
 
@@ -129,6 +182,44 @@ watchEffect(() => {
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-primary);
+}
+
+.friend-btn {
+  position: relative;
+}
+
+.badge-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--danger);
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }
 
 .main-content {

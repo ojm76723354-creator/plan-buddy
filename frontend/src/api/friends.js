@@ -14,3 +14,8 @@ export const acceptFriend = async (friendshipId) => {
   const response = await api.post(`/friends/${friendshipId}/accept`);
   return response.data;
 };
+
+export const getPendingFriendRequestsCount = async () => {
+  const response = await api.get('/friends/pending-count');
+  return response.data;
+};
