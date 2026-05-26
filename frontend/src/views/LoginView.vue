@@ -9,6 +9,7 @@ const isLoginMode = ref(true)
 const username = ref('')
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const errorMsg = ref('')
 
 const toggleMode = () => {
@@ -66,7 +67,8 @@ const handleSubmit = async () => {
 
         <div class="form-group">
           <label>비밀번호</label>
-          <input type="password" v-model="password" class="form-control" required placeholder="비밀번호를 입력하세요"/>
+            <input :type="showPassword ? 'text' : 'password'" v-model="password" class="form-control" required placeholder="비밀번호를 입력하세요"/>
+            <button class="btn btn-icon" @click="showPassword = !showPassword" type="button">{{ showPassword ? '🔓' : '🔒' }}</button>
         </div>
 
         <div v-if="errorMsg" class="error-message">
