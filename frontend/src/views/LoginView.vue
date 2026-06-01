@@ -25,6 +25,8 @@ const handleSubmit = async () => {
   try {
     if (isLoginMode.value) {
       await login(username.value, password.value)
+      // Save username for live features identifier
+      localStorage.setItem('username', username.value)
       // Navigate normally - App.vue will pick up the token from localStorage
       router.push('/')
     } else {

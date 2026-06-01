@@ -102,9 +102,14 @@ const handleSaveEvent = async (savedEvent) => {
     const payload = {
       title: savedEvent.title || '새 일정',
       description: savedEvent.content || '',
+      location: savedEvent.location || '',
+      latitude: savedEvent.latitude,
+      longitude: savedEvent.longitude,
+      radius: savedEvent.radius || 50,
       start_time: savedEvent.start instanceof Date ? savedEvent.start.toISOString() : new Date(savedEvent.start).toISOString(),
       end_time: savedEvent.end instanceof Date ? savedEvent.end.toISOString() : new Date(savedEvent.end).toISOString(),
-      visibility: savedEvent.visibility || 'PRIVATE'
+      visibility: savedEvent.visibility || 'PRIVATE',
+      invitees: savedEvent.invitees || []
     }
     const newEv = await createEvent(payload)
     events.value.push({

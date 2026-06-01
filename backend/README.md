@@ -12,7 +12,7 @@ JWT 인증, 이벤트 관리, 친구 시스템을 제공합니다.
 | 언어 | Python 3.14+ |
 | 프레임워크 | FastAPI 0.135+ |
 | ORM | SQLAlchemy 2.0 |
-| 데이터베이스 | SQLite (개발) / PostgreSQL (운영) |
+| 데이터베이스 | LSQLite (개발) / PostgreSQ (운영) |
 | 인증 | JWT (PyJWT + bcrypt) |
 | 패키지 매니저 | uv |
 | 서버 | Uvicorn |

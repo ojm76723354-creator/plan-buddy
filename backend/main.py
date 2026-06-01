@@ -42,7 +42,9 @@ app.include_router(calendar_router, prefix="/calendar", tags=["Calendar"])
 app.include_router(mypage_router, prefix="/mypage", tags=["MyPage"])
 
 from routers.friend_router import friend_router
+from routers.location_router import location_router
 app.include_router(friend_router, prefix="/friends", tags=["Friends"])
+app.include_router(location_router, prefix="/location", tags=["Location"])
 
 @app.get("/")
 def home():

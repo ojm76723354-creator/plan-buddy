@@ -19,6 +19,11 @@ const router = createRouter({
       name: 'mypage',
       component: () => import('../views/MyPageView.vue'),
     },
+    {
+      path: '/live/:id',
+      name: 'live',
+      component: () => import('../views/LiveMeetingView.vue'),
+    },
   ],
 })
 

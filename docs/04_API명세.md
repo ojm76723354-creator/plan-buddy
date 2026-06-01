@@ -95,9 +95,13 @@
   "title": "스터디 모임",
   "description": "알고리즘 스터디",
   "location": "도서관",
+  "latitude": 37.5665,
+  "longitude": 126.9780,
+  "radius": 50,
   "start_time": "2026-05-12T10:00:00",
   "end_time": "2026-05-12T12:00:00",
-  "visibility": "PUBLIC"
+  "visibility": "PUBLIC",
+  "invitees": ["friend1", "friend2"]
 }
 ```
 
@@ -105,7 +109,20 @@
 
 ---
 
-## 3. 친구 API (`/friends`)
+## 3. 위치 및 실시간 API (`/location`)
+
+| 메서드 | 경로 | 설명 |
+|--------|------|------|
+| `POST` | `/location/{event_id}/status` | 참여 상태 변경 (수락/거절) |
+| `POST` | `/location/{event_id}/location` | 내 위치 업데이트 및 자동 체크인 확인 |
+| `GET` | `/location/{event_id}/participants`| 참여자 실시간 위치 목록 조회 |
+| `POST` | `/location/{event_id}/chat` | 임시 채팅 메시지 발송 |
+| `GET` | `/location/{event_id}/chat` | 임시 채팅 내역 조회 |
+| `GET` | `/location/stats/{username}` | 유저 정시 도착 통계 조회 |
+
+---
+
+## 4. 친구 API (`/friends`)
 
 > ⚠️ 모든 친구 API는 인증 필요
 

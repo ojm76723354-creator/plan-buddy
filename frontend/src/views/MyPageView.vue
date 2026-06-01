@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const user = ref(null)
+const stats = ref(null)
 const newUsername = ref('')
 const oldPassword = ref('')
 const newPassword = ref('')
@@ -24,6 +25,7 @@ const fetchUser = async () => {
     if (user.value.profile_image) {
       profilePreview.value = 'http://localhost:8000' + user.value.profile_image
     }
+    fetchStats()
   } catch (err) {
     console.error("Failed to fetch user info", err)
     if (err.response && err.response.status === 401) {
@@ -31,6 +33,16 @@ const fetchUser = async () => {
     } else {
       showMessage('사용자 정보를 불러오는데 실패했습니다. 서버 상태를 확인해주세요.', 'error')
     }
+  }
+}
+
+const fetchStats = async () => {
+  if (!user.value) return
+  try {
+    const res = await axios.get(`http://localhost:8000/api/location/stats/${user.value.username}`, { withCredentials: true })
+    stats.value = res.data
+  } catch (err) {
+    console.error("Failed to fetch statistics", err)
   }
 }
 
@@ -114,6 +126,28 @@ const showMessage = (text, type) => {
             <button class="btn btn-outline" @click="$refs.fileInput.click()">사진 선택</button>
             <button class="btn btn-primary" @click="handleUploadImage" :disabled="!profileFile">업로드</button>
           </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Appointment Stats -->
+        <div class="stats-section" v-if="stats">
+          <h3 class="section-title">약속 통계 📊</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">총 도착 횟수</span>
+              <span class="stat-value">{{ stats.total_arrivals }}회</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">정시 도착</span>
+              <span class="stat-value">{{ stats.on_time_arrivals }}회</span>
+            </div>
+            <div class="stat-item highlight">
+              <span class="stat-label">약속 준수율</span>
+              <span class="stat-value">{{ stats.punctuality_rate.toFixed(1) }}%</span>
+            </div>
+          </div>
+          <p class="stats-hint">정시 도착률로 당신의 신뢰도를 관리하세요!</p>
         </div>
       </div>
 
@@ -242,6 +276,55 @@ const showMessage = (text, type) => {
   font-size: 3rem;
   font-weight: 700;
   color: var(--primary);
+}
+
+.stats-section {
+  width: 100%;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.25rem;
+  background-color: var(--bg-color);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.stat-item.highlight {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.highlight .stat-value {
+  color: var(--primary);
+}
+
+.stats-hint {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 1rem;
 }
 
 .upload-controls {
