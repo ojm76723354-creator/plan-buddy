@@ -19,11 +19,7 @@ app = FastAPI()
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        frontend_url, 
-        "http://localhost:5173", 
-        "https://plan-buddy-seven.vercel.app"
-    ], # 로컬과 배포 주소 모두 허용
+    allow_origins=["*"], # 모든 도메인 허용 (테스트용)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
