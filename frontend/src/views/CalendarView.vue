@@ -5,7 +5,8 @@ import 'vue-cal/dist/vuecal.css'
 import EventModal from '../components/EventModal.vue'
 import { getEvents, createEvent, getFriendEvents } from '../api/calendar'
 import { getFriends } from '../api/friends'
-import { getMe, API_BASE_URL } from '../api/auth'
+import { getMe } from '../api/mypage'
+import { API_BASE_URL } from '../api/auth'
 
 const selectedDate = ref(new Date())
 const activeView = ref('week') // 'month', 'week', 'day'
