@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getMe, uploadProfileImage, updateUsername, updatePassword } from '../api/mypage'
+import { API_BASE_URL, api } from '../api/auth'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -23,7 +24,7 @@ const fetchUser = async () => {
     user.value = await getMe()
     newUsername.value = user.value.username
     if (user.value.profile_image) {
-      profilePreview.value = 'http://localhost:8000' + user.value.profile_image
+      profilePreview.value = API_BASE_URL + user.value.profile_image
     }
     fetchStats()
   } catch (err) {
@@ -39,7 +40,7 @@ const fetchUser = async () => {
 const fetchStats = async () => {
   if (!user.value) return
   try {
-    const res = await axios.get(`http://localhost:8000/api/location/stats/${user.value.username}`, { withCredentials: true })
+    const res = await api.get(`/location/stats/${user.value.username}`, { withCredentials: true })
     stats.value = res.data
   } catch (err) {
     console.error("Failed to fetch statistics", err)

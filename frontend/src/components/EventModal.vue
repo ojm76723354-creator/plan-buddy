@@ -1,6 +1,6 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch, onMounted } from 'vue'
-import axios from 'axios'
+import { api, API_BASE_URL } from '../api/auth'
 import NaverMapSelector from './NaverMapSelector.vue'
 
 const props = defineProps({
@@ -25,7 +25,7 @@ const invitees = ref([])
 
 onMounted(async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/friend/list', { withCredentials: true })
+    const res = await api.get('/friends/list', { withCredentials: true })
     friends.value = res.data.filter(f => f.status === 'ACCEPTED')
   } catch (err) {
     console.error("Failed to load friends", err)
@@ -165,7 +165,7 @@ const saveEvent = () => {
               @click="toggleInvitee(friend.friend_username)"
             >
               <div v-if="friend.profile_image" class="avatar-small">
-                <img :src="'http://localhost:8000' + friend.profile_image" />
+                <img :src="API_BASE_URL + friend.profile_image" />
               </div>
               <span v-else class="avatar-placeholder">{{ friend.friend_username[0].toUpperCase() }}</span>
               <span class="friend-name">{{ friend.friend_username }}</span>

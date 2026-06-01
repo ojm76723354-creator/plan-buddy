@@ -5,7 +5,7 @@ import 'vue-cal/dist/vuecal.css'
 import EventModal from '../components/EventModal.vue'
 import { getEvents, createEvent, getFriendEvents } from '../api/calendar'
 import { getFriends } from '../api/friends'
-import { getMe } from '../api/mypage'
+import { getMe, API_BASE_URL } from '../api/auth'
 
 const selectedDate = ref(new Date())
 const activeView = ref('week') // 'month', 'week', 'day'
@@ -140,7 +140,7 @@ const handleSaveEvent = async (savedEvent) => {
           @click="selectUser({ id: 'me', username: '내 일정' })"
         >
           <div v-if="currentUser?.profile_image" class="friend-avatar profile-small">
-            <img :src="'http://localhost:8000' + currentUser.profile_image" alt="Me" />
+            <img :src="API_BASE_URL + currentUser.profile_image" alt="Me" />
           </div>
           <span v-else class="nav-icon">👤</span>
           <span class="nav-text">내 일정</span>
@@ -157,7 +157,7 @@ const handleSaveEvent = async (savedEvent) => {
             @click="selectUser({ id: friend.id, username: friend.friend_username })"
           >
             <div v-if="friend.profile_image" class="friend-avatar profile-small">
-              <img :src="'http://localhost:8000' + friend.profile_image" alt="Friend" />
+              <img :src="API_BASE_URL + friend.profile_image" alt="Friend" />
             </div>
             <div v-else class="friend-avatar">{{ friend.friend_username.substring(0, 1).toUpperCase() }}</div>
             <span class="nav-text">{{ friend.friend_username }}</span>

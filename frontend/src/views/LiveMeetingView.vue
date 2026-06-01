@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import { API_BASE_URL, api } from '../api/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -16,12 +16,12 @@ const mapContainer = ref(null)
 let map = null
 let markers = {} // user_id -> marker
 
-const API_BASE = 'http://localhost:8000/api'
+const API_BASE = API_BASE_URL + '/api'
 
 // 1. 데이터 로드
 const fetchEventData = async () => {
   try {
-    const res = await axios.get(`${API_BASE}/calendar/${eventId}`, { withCredentials: true })
+    const res = await api.get(`/calendar/${eventId}`, { withCredentials: true })
     event.value = res.data
     participants.value = res.data.participants
     const me = res.data.participants.find(p => p.username === localStorage.getItem('username'))
@@ -33,7 +33,7 @@ const fetchEventData = async () => {
 
 const fetchParticipants = async () => {
   try {
-    const res = await axios.get(`${API_BASE}/location/${eventId}/participants`, { withCredentials: true })
+    const res = await api.get(`/location/${eventId}/participants`, { withCredentials: true })
     participants.value = res.data
     updateMarkers()
   } catch (err) {
@@ -43,7 +43,7 @@ const fetchParticipants = async () => {
 
 const fetchChat = async () => {
   try {
-    const res = await axios.get(`${API_BASE}/location/${eventId}/chat`, { withCredentials: true })
+    const res = await api.get(`/location/${eventId}/chat`, { withCredentials: true })
     messages.value = res.data
   } catch (err) {
     console.error("Failed to fetch chat", err)
@@ -110,7 +110,7 @@ const startTracking = () => {
     async (pos) => {
       const { latitude, longitude } = pos.coords
       try {
-        const res = await axios.post(`${API_BASE}/location/${eventId}/location`, {
+        const res = await api.post(`/location/${eventId}/location`, {
           latitude,
           longitude
         }, { withCredentials: true })
@@ -132,7 +132,7 @@ const startTracking = () => {
 const sendChat = async () => {
   if (!newMessage.value.trim()) return
   try {
-    await axios.post(`${API_BASE}/location/${eventId}/chat`, {
+    await api.post(`/location/${eventId}/chat`, {
       message: newMessage.value
     }, { withCredentials: true })
     newMessage.value = ''
