@@ -51,25 +51,42 @@ const fetchChat = async () => {
 }
 
 // 2. 지도 초기화 및 업데이트
-const initMap = () => {
-  if (!window.naver || !event.value || !event.value.latitude) return
+const initMap = async () => {
+  if (!window.naver) {
+    console.error('Naver Maps API not loaded')
+    return
+  }
+
+  if (!event.value || !event.value.latitude) {
+    console.warn('Event data not ready for map initialization')
+    return
+  }
 
   const mapOptions = {
     center: new naver.maps.LatLng(event.value.latitude, event.value.longitude),
-    zoom: 14
+    zoom: 14,
+    mapTypeControl: true
   }
-  map = new naver.maps.Map(mapContainer.value, mapOptions)
+  
+  if (mapContainer.value) {
+    map = new naver.maps.Map(mapContainer.value, mapOptions)
 
-  // 약속 장소 마커 (빨간색 등 강조)
-  new naver.maps.Marker({
-    position: new naver.maps.LatLng(event.value.latitude, event.value.longitude),
-    map: map,
-    title: event.value.location,
-    icon: {
-      content: '<div style="background: #ef4444; color: white; padding: 5px 10px; border-radius: 20px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2)">🚩 약속 장소</div>',
-      anchor: new naver.maps.Point(15, 15)
-    }
-  })
+    // 약속 장소 마커 (빨간색 등 강조)
+    new naver.maps.Marker({
+      position: new naver.maps.LatLng(event.value.latitude, event.value.longitude),
+      map: map,
+      title: event.value.location,
+      icon: {
+        content: '<div style="background: #ef4444; color: white; padding: 5px 10px; border-radius: 20px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2)">🚩 약속 장소</div>',
+        anchor: new naver.maps.Point(15, 15)
+      }
+    })
+
+    // 레이아웃이 잡힌 후 크기 재조정
+    setTimeout(() => {
+      if (map) naver.maps.Event.trigger(map, 'resize')
+    }, 500)
+  }
 }
 
 const updateMarkers = () => {
