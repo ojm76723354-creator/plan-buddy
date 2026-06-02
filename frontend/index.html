@@ -5,11 +5,11 @@
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan Buddy</title>
-    <!-- Naver Maps API -->
-    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=x89xhrtmn8&submodules=geocoder"></script>
   </head>
   <body>
     <div id="app"></div>
+    <!-- Naver Maps API moved to body for better loading order -->
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=x89xhrtmn8&submodules=geocoder"></script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
