@@ -74,6 +74,9 @@ const closeModal = () => {
 const updateLocation = (loc) => {
   latitude.value = loc.lat
   longitude.value = loc.lng
+  if (loc.address) {
+    location.value = loc.address
+  }
 }
 
 const toggleInvitee = (username) => {
