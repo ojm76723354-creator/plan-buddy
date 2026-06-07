@@ -2,7 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 # 1. DB 및 모델 불러오기 (테이블 자동 생성)
 from database import engine, Base
@@ -43,8 +46,10 @@ app.include_router(mypage_router, prefix="/mypage", tags=["MyPage"])
 
 from routers.friend_router import friend_router
 from routers.location_router import location_router
+from routers.places_router import places_router
 app.include_router(friend_router, prefix="/friends", tags=["Friends"])
 app.include_router(location_router, prefix="/location", tags=["Location"])
+app.include_router(places_router, prefix="/places", tags=["Places"])
 
 @app.get("/")
 def home():

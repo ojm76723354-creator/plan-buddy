@@ -122,7 +122,51 @@
 
 ---
 
-## 4. 친구 API (`/friends`)
+## 4. 장소 검색 API (`/places`)
+
+> ⚠️ 인증 필요. 백엔드에 `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` 환경 변수 설정 필요.
+
+| 메서드 | 경로 | 설명 |
+|--------|------|------|
+| `GET` | `/places/search` | 키워드로 장소 검색 (Naver Local Search API 프록시) |
+
+### GET /places/search — 장소 검색
+
+**Query Parameters**
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|----------|------|------|------|
+| `q` | string | ✅ | 검색 키워드 (예: "스타벅스 강남", "도서관") |
+
+**Response** `200 OK`
+```json
+{
+  "items": [
+    {
+      "title": "스타벅스 강남역점",
+      "category": "카페,음료,스타벅스",
+      "address": "서울특별시 강남구 강남대로 390",
+      "roadAddress": "서울특별시 강남구 강남대로 390",
+      "lat": 37.4979,
+      "lng": 127.0276
+    }
+  ]
+}
+```
+
+**Error Responses**
+| 코드 | 설명 |
+|------|------|
+| `503` | 서버에 Naver API 자격증명이 설정되지 않은 경우 |
+| `502` | Naver API 호출 오류 |
+| `504` | Naver API 응답 시간 초과 |
+
+> **설정 방법**: `backend/.env` 파일에 `NAVER_CLIENT_ID`와 `NAVER_CLIENT_SECRET`을 추가하세요.  
+> Naver Open API 자격증명은 [https://developers.naver.com/apps/](https://developers.naver.com/apps/) 에서 앱 등록 후 "검색" API를 활성화하면 발급됩니다.
+
+---
+
+## 5. 친구 API (`/friends`)
 
 > ⚠️ 모든 친구 API는 인증 필요
 
