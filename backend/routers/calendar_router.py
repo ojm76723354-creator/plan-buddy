@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from typing import List
 from database import get_db
-from models import Event, User, EventParticipant, ParticipantStatus, EventVisibility
+from models import Event, User, EventParticipant, ParticipantStatus, EventVisibility, Friendship, FriendshipStatus
 from schemas import EventCreate, EventResponse
 from security import get_current_user
 
@@ -115,6 +115,36 @@ def create_event(
         .one()
     )
     return _build_event_dict(saved)
+
+
+@calendar_router.get("/friends/{username}", response_model=List[EventResponse])
+def get_friend_events(
+    username: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    target = db.query(User).filter(User.username == username).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    friendship = db.query(Friendship).filter(
+        ((Friendship.user_id_1 == current_user.id) & (Friendship.user_id_2 == target.id)) |
+        ((Friendship.user_id_1 == target.id) & (Friendship.user_id_2 == current_user.id)),
+        Friendship.status == FriendshipStatus.ACCEPTED,
+    ).first()
+    is_friend = friendship is not None
+
+    allowed_visibilities = [EventVisibility.PUBLIC]
+    if is_friend:
+        allowed_visibilities.append(EventVisibility.FRIENDS_ONLY)
+
+    events = (
+        db.query(Event)
+        .options(joinedload(Event.participants).joinedload(EventParticipant.user))
+        .filter(Event.user_id == target.id, Event.visibility.in_(allowed_visibilities))
+        .all()
+    )
+    return [_build_event_dict(e) for e in events]
 
 
 @calendar_router.get("/{event_id}", response_model=EventResponse)
