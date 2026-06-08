@@ -433,6 +433,24 @@ const handleSaveEvent = async (savedEvent) => {
   background-color: var(--bg-color);
 }
 
+/* 다크모드: 선택된 날짜 셀 배경을 연하게 */
+[data-theme='dark'] :deep(.vuecal__cell--selected) {
+  background-color: rgba(129, 140, 248, 0.12) !important;
+}
+
+/* 다크모드: 선택 셀 안의 일정 텍스트 가독성 보장 */
+[data-theme='dark'] :deep(.vuecal__cell--selected .vuecal__event) {
+  background-color: rgba(129, 140, 248, 0.25) !important;
+  color: #f8fafc !important;
+  border-left-color: #818cf8 !important;
+}
+
+[data-theme='dark'] :deep(.vuecal__cell--selected .custom-event),
+[data-theme='dark'] :deep(.vuecal__cell--selected .event-title),
+[data-theme='dark'] :deep(.vuecal__cell--selected .event-content) {
+  color: #f8fafc !important;
+}
+
 .custom-event {
   display: flex;
   flex-direction: column;

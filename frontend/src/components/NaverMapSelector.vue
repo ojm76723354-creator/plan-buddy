@@ -492,6 +492,6 @@ watch(() => [props.lat, props.lng], ([newLat, newLng]) => {
 }
 
 [data-theme="dark"] .map-canvas {
-  filter: grayscale(1) invert(0.9) hue-rotate(180deg);
+  filter: brightness(0.92) saturate(0.9);
 }
 </style>
