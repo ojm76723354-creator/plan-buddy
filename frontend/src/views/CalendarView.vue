@@ -7,6 +7,7 @@ import { getEvents, createEvent, getFriendEvents } from '../api/calendar'
 import { getFriends } from '../api/friends'
 import { getMe } from '../api/mypage'
 import { API_BASE_URL } from '../api/auth'
+import { MapPin } from 'lucide-vue-next'
 
 const selectedDate = ref(new Date())
 const activeView = ref('week') // 'month', 'week', 'day'
@@ -18,6 +19,14 @@ const friendList = ref([])
 const currentUser = ref(null)
 const selectedUser = ref({ id: 'me', username: '내 일정' })
 
+const toCalEvent = (ev) => ({
+  ...ev,
+  start: new Date(ev.start_time),
+  end: new Date(ev.end_time),
+  content: ev.description,
+  class: (ev.latitude && ev.longitude) ? 'gps-event' : '',
+})
+
 const fetchUserEvents = async () => {
   try {
     let data
@@ -26,13 +35,7 @@ const fetchUserEvents = async () => {
     } else {
       data = await getFriendEvents(selectedUser.value.username)
     }
-    
-    events.value = data.map(ev => ({
-      ...ev,
-      start: new Date(ev.start_time),
-      end: new Date(ev.end_time),
-      content: ev.description
-    }))
+    events.value = data.map(toCalEvent)
   } catch (error) {
     console.error("Failed to fetch events", error)
   }
@@ -113,12 +116,7 @@ const handleSaveEvent = async (savedEvent) => {
       invitees: savedEvent.invitees || []
     }
     const newEv = await createEvent(payload)
-    events.value.push({
-      ...newEv,
-      start: new Date(newEv.start_time),
-      end: new Date(newEv.end_time),
-      content: newEv.description
-    })
+    events.value.push(toCalEvent(newEv))
     closeModal()
   } catch (error) {
     console.error("Failed to save event", error)
@@ -223,10 +221,13 @@ const handleSaveEvent = async (savedEvent) => {
           :time-step="30"
         >
           <template #event="{ event, view }">
-            <div class="custom-event">
-              <div class="event-title">{{ event.title }}</div>
-              <div class="event-content" v-if="view === 'week' || view === 'day'">
-                {{ event.content }}
+            <div class="custom-event" :class="{ 'is-gps': event.latitude && event.longitude }">
+              <div class="event-title">
+                <MapPin v-if="event.latitude && event.longitude" class="event-pin" :size="11" />
+                {{ event.title }}
+              </div>
+              <div class="event-meta" v-if="(view === 'week' || view === 'day') && (event.location || event.content)">
+                {{ event.location || event.content }}
               </div>
             </div>
           </template>
@@ -465,6 +466,7 @@ const handleSaveEvent = async (savedEvent) => {
   margin-bottom: 2px;
 }
 
+/* 일반 일정 */
 :deep(.vuecal__event) {
   background-color: var(--primary-light);
   color: var(--primary);
@@ -474,5 +476,45 @@ const handleSaveEvent = async (savedEvent) => {
 
 :deep(.vuecal__event:hover) {
   opacity: 0.9;
+}
+
+/* GPS 약속 일정 — 초록 계열로 구분 */
+:deep(.vuecal__event.gps-event) {
+  background-color: rgba(16, 185, 129, 0.13);
+  color: #059669;
+  border-left: 3px solid #10b981;
+}
+
+:deep(.vuecal__event.gps-event:hover) {
+  background-color: rgba(16, 185, 129, 0.22);
+}
+
+[data-theme='dark'] :deep(.vuecal__event.gps-event) {
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-left-color: #34d399;
+}
+
+/* 선택 셀 안의 GPS 이벤트도 가독성 유지 */
+[data-theme='dark'] :deep(.vuecal__cell--selected .vuecal__event.gps-event) {
+  background-color: rgba(52, 211, 153, 0.25) !important;
+  color: #6ee7b7 !important;
+  border-left-color: #6ee7b7 !important;
+}
+
+.event-pin {
+  display: inline;
+  vertical-align: middle;
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+
+.event-meta {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
 }
 </style>
