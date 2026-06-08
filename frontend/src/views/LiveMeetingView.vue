@@ -13,6 +13,7 @@ const messages = ref([])
 const newMessage = ref('')
 const myStatus = ref('PENDING')
 const mapContainer = ref(null)
+const myUsername = localStorage.getItem('username') || ''
 let map = null
 let markers = {} // user_id -> marker
 
@@ -222,8 +223,8 @@ onMounted(async () => {
         <div class="chat-card card">
           <h3 class="section-title">임시 채팅</h3>
           <div class="chat-messages" ref="chatBox">
-            <div v-for="m in messages" :key="m.id" class="message" :class="{ mine: m.username === localStorage.getItem('username') }">
-              <div class="msg-meta" v-if="m.username !== localStorage.getItem('username')">{{ m.username }}</div>
+            <div v-for="m in messages" :key="m.id" class="message" :class="{ mine: m.username === myUsername }">
+              <div class="msg-meta" v-if="m.username !== myUsername">{{ m.username }}</div>
               <div class="msg-bubble">{{ m.message }}</div>
             </div>
           </div>
