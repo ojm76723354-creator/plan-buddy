@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-from models import Event, User, Friendship, FriendshipStatus, EventVisibility
+from models import Event, User, Friendship, FriendshipStatus, EventVisibility, EventParticipant, ParticipantStatus
 from schemas import EventCreate, EventResponse
 from security import get_current_user
 from datetime import datetime
@@ -13,9 +13,9 @@ calendar_router = APIRouter()
 def get_events(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # 내가 소유한 이벤트 또는 수락된 참여자로 등록된 이벤트 조회
     owned_events = db.query(Event).filter(Event.user_id == current_user.id).all()
-    participating_events = db.query(Event).join(models.EventParticipant).filter(
-        (models.EventParticipant.user_id == current_user.id) & 
-        (models.EventParticipant.status != models.ParticipantStatus.REJECTED)
+    participating_events = db.query(Event).join(EventParticipant).filter(
+        (EventParticipant.user_id == current_user.id) & 
+        (EventParticipant.status != ParticipantStatus.REJECTED)
     ).all()
     
     all_events = list(set(owned_events + participating_events))
@@ -56,10 +56,10 @@ def create_event(event: EventCreate, db: Session = Depends(get_db), current_user
     db.flush() # ID를 얻기 위해 (초대에 필요)
 
     # 작성자 본인을 참여자로 자동 등록 (ACCEPTED 상태)
-    creator_participant = models.EventParticipant(
+    creator_participant = EventParticipant(
         event_id=new_event.id,
         user_id=current_user.id,
-        status=models.ParticipantStatus.ACCEPTED
+        status=ParticipantStatus.ACCEPTED
     )
     db.add(creator_participant)
 
@@ -68,10 +68,10 @@ def create_event(event: EventCreate, db: Session = Depends(get_db), current_user
         for username in event.invitees:
             invitee = db.query(User).filter(User.username == username).first()
             if invitee and invitee.id != current_user.id:
-                new_participant = models.EventParticipant(
+                new_participant = EventParticipant(
                     event_id=new_event.id,
                     user_id=invitee.id,
-                    status=models.ParticipantStatus.PENDING
+                    status=ParticipantStatus.PENDING
                 )
                 db.add(new_participant)
     

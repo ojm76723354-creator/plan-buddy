@@ -122,7 +122,15 @@ const handleSaveEvent = async (savedEvent) => {
     closeModal()
   } catch (error) {
     console.error("Failed to save event", error)
-    alert('일정 저장에 실패했습니다. 로그인이 되어있는지 확인해주세요!')
+    const status = error.response?.status
+    const detail = error.response?.data?.detail
+    if (status === 401 || status === 403) {
+      alert('로그인이 만료되었습니다. 다시 로그인해 주세요.')
+    } else if (detail) {
+      alert(`일정 저장 실패: ${detail}`)
+    } else {
+      alert('일정 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+    }
   }
 }
 </script>
